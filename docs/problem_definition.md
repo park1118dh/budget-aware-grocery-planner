@@ -55,6 +55,7 @@ The system produces the following outputs:
   selected, expressed in terms of user preferences, constraints, and
   optimization objectives.
 
+
 ## Optimization Objective
 
 The system is formulated as a constrained optimization problem.
@@ -74,5 +75,30 @@ maximize alignment with foods the user enjoys.
 Secondary objectives, used only as tie-breakers, include minimizing
 deviation from nutritional targets and maximizing nutritional value per
 dollar spent.
+
+
+## System Queries
+
+The system is designed to support the following core queries:
+
+1. Generate grocery list  
+   Given a user’s dietary goal, budget, food preferences, and dietary
+   restrictions, generate a grocery list that satisfies all hard
+   constraints and maximizes the user preference score.
+
+2. Evaluate alternative grocery lists  
+   Given two or more candidate grocery lists that satisfy all hard
+   constraints, determine which list is preferred based on the
+   optimization objective.
+
+3. Substitute food item  
+   Given a food item in the grocery list and a set of user constraints,
+   identify an alternative item that preserves user preference as much
+   as possible while improving cost efficiency or nutritional alignment.
+
+4. Recompute grocery list under updated constraints  
+   Given a change in user inputs (e.g., budget adjustment or updated
+   preferences), regenerate a grocery list that reflects the updated
+   constraints while maintaining optimization priorities.
 
 
