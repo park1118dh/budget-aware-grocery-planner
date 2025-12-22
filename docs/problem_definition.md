@@ -55,5 +55,24 @@ The system produces the following outputs:
   selected, expressed in terms of user preferences, constraints, and
   optimization objectives.
 
+## Optimization Objective
+
+The system is formulated as a constrained optimization problem.
+
+The primary objective is to maximize a quantified user preference score,
+subject to the following hard constraints:
+
+- The total estimated cost of the grocery list must not exceed the
+  user-defined budget.
+- Foods explicitly marked as disliked must not be included.
+- Dietary restrictions must be respected at all times.
+
+User preferences are treated as soft objectives. Among all grocery lists
+that satisfy the hard constraints, the system prefers solutions that
+maximize alignment with foods the user enjoys.
+
+Secondary objectives, used only as tie-breakers, include minimizing
+deviation from nutritional targets and maximizing nutritional value per
+dollar spent.
 
 
