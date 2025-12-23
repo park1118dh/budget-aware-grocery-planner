@@ -102,3 +102,21 @@ The system is designed to support the following core queries:
    constraints while maintaining optimization priorities.
 
 
+## Assumptions and Non-Goals
+
+### Assumptions
+
+- Nutritional values and food costs are approximate and may vary by
+  brand, store, or region.
+- Caloric and macronutrient targets are either provided by the user or
+  computed outside the core optimization logic.
+- Food availability is assumed; the system does not account for
+  real-time grocery store inventory.
+
+### Non-Goals
+
+- Providing medical, dietary, or nutritional advice.
+- Diagnosing health conditions or prescribing calorie targets.
+- Guaranteeing specific health or fitness outcomes.
+- Performing real-time price comparisons across grocery stores.
+- Acting as a conversational or chat-based recommendation system.
