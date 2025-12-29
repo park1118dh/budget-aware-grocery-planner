@@ -48,7 +48,7 @@ def select_foods_under_budget(foods: List[Dict], liked_food_ids: Set[str], budge
             selected.append(food)
             total_cost += cost
 
-    return selected
+    return selected, total_cost
 
 def compute_nutrition_summary(selected_foods: List[Dict]) -> Dict:
     summary = {"calories": 0.0, "protein": 0.0, "carbs": 0.0, "fat": 0.0,}
@@ -59,6 +59,29 @@ def compute_nutrition_summary(selected_foods: List[Dict]) -> Dict:
         summary["fat"] += food["fat_per_unit"]
     return summary
 
+def count_categories(selected_foods):
+    counts = {}
+    for food in selected_foods:
+        category = food["category"]
+        counts[category] = counts.get(category, 0) + 1
+    return counts
+
+def has_required_protein(category_counts):
+    return category_counts.get("protein", 0) > 0
+
+def find_cheapest_food_by_category(foods, category):
+    cheapest = None
+    for food in foods:
+        if food["category"] != category:
+            continue
+        if cheapest is None:
+            cheapest = food
+            continue
+        if food["cost_per_unit"] < cheapest["cost_per_unit"]:
+            cheapest = food    
+    return cheapest
+
+
 if __name__ == "__main__":
     foods = load_foods("data/foods.json")
     disliked_food_ids = {"food_003"}
@@ -66,8 +89,24 @@ if __name__ == "__main__":
     liked_food_ids = {"food_001", "food_005"}
     budget = 5.0
     filtered_foods = filter_foods(foods, disliked_food_ids, dietary_restrictions,)
-    selected_foods = select_foods_under_budget(filtered_foods, liked_food_ids, budget,)
+    selected_foods, total_cost = select_foods_under_budget(filtered_foods, liked_food_ids, budget,)
     nutrition_summary = compute_nutrition_summary(selected_foods)
+    category_counts = count_categories(selected_foods)
+    has_protein = has_required_protein(category_counts)
+    if not has_protein:
+        cheapest_protein = find_cheapest_food_by_category(filtered_foods, "protein")
+        if cheapest_protein is None:
+            raise ValueError("No protein foods available to satisfy requirement")
+        protein_cost = cheapest_protein["cost_per_unit"]
+        if total_cost + protein_cost <= budget:
+            total_cost += protein_cost
+            selected_foods.append(cheapest_protein)
+            category_counts["protein"] = category_counts.get("protein", 0) + 1
+        else:
+            raise ValueError("Cannot satisfy protein requirement within budget")
+    
+    print("category counts:", category_counts)
+    print("has required protein:", has_protein)
     print("selected foods:", selected_foods)
     print("nutriotion summary:", nutrition_summary)
 
