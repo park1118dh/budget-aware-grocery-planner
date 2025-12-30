@@ -81,18 +81,39 @@ def find_cheapest_food_by_category(foods, category):
             cheapest = food    
     return cheapest
 
+def get_removable_foods(selected_foods):
+    removable = []
+    for food in selected_foods:
+        if food["category"] == "protein":
+            continue
+        removable.append(food)
+    return removable
+
+def choose_food_to_remove(removable_foods):
+    worst = None
+    for food in removable_foods:
+        cost_per_calorie = food["cost_per_unit"]/food["calories_per_unit"]
+        if worst is None:
+            worst = food
+            worst_score = cost_per_calorie
+        if cost_per_calorie < worst_score:
+            worst = food
+            worst_score = cost_per_calorie
+    return worst
+
 
 if __name__ == "__main__":
     foods = load_foods("data/foods.json")
-    disliked_food_ids = {"food_003"}
-    dietary_restrictions = {"vegetarian"}
+    disliked_food_ids = []
+    dietary_restrictions = []
     liked_food_ids = {"food_001", "food_005"}
-    budget = 5.0
+    budget = 2.0
     filtered_foods = filter_foods(foods, disliked_food_ids, dietary_restrictions,)
     selected_foods, total_cost = select_foods_under_budget(filtered_foods, liked_food_ids, budget,)
-    nutrition_summary = compute_nutrition_summary(selected_foods)
     category_counts = count_categories(selected_foods)
     has_protein = has_required_protein(category_counts)
+    nutrition_summary = compute_nutrition_summary(selected_foods)
+    removable_foods = get_removable_foods(selected_foods)
     if not has_protein:
         cheapest_protein = find_cheapest_food_by_category(filtered_foods, "protein")
         if cheapest_protein is None:
@@ -103,11 +124,30 @@ if __name__ == "__main__":
             selected_foods.append(cheapest_protein)
             category_counts["protein"] = category_counts.get("protein", 0) + 1
         else:
-            raise ValueError("Cannot satisfy protein requirement within budget")
+            removable_foods = get_removable_foods(selected_foods)
+            if not removable_foods:
+                raise ValueError("Cannot swap to satisfy protein requirement")
+            food_to_remove = choose_food_to_remove(removable_foods)
+            selected_foods.remove(food_to_remove)
+            total_cost -= food_to_remove["cost_per_unit"]
+            selected_foods.append(cheapest_protein)
+            total_cost += protein_cost
+            removed_cat = food_to_remove["category"]
+            category_counts[removed_cat] -= 1
+            category_counts["protein"] = category_counts.get("protein", 0) + 1
+            has_protein = True
+
+            print()
     
+    print("removable foods:", removable_foods)
+    print()
     print("category counts:", category_counts)
+    print()
     print("has required protein:", has_protein)
+    print()
     print("selected foods:", selected_foods)
-    print("nutriotion summary:", nutrition_summary)
+    print()
+    print("nutrition summary:", nutrition_summary)
+    print()
 
    
